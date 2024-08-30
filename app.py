@@ -12,9 +12,10 @@ from langchain_community.document_loaders import PyPDFDirectoryLoader
 from dotenv import load_dotenv
 load_dotenv()
 
-groq_api_key =os.environ['GROQ_API_KEY']
+groq_api_key =os.getenv('GROQ_API_KEY')
 
-st.title("HuggingFace 'BAAI/bge-large-en-v1.5' embedding model & Objectbox VectorDB With Groq(Llama-3.1-70b-Versatile) Demo")
+st.title("US Census RAG QA Bot")
+st.write("Using HuggingFace 'BAAI/bge-large-en-v1.5' embedding model & Objectbox VectorDB With Groq(Llama-3.1-70b-Versatile)")
 
 llm=ChatGroq(groq_api_key=groq_api_key,
              model_name="Llama-3.1-70b-Versatile")
@@ -58,11 +59,15 @@ def vector_embedding():
         st.session_state.vectors=ObjectBox.from_documents(st.session_state.final_documents,st.session_state.embeddings,embedding_dimensions=1024) ## Vector HuggingFaceBgeEmbeddings
 
 
-input_prompt= st.text_input("Enter Your Question From Documents")
+st.write("Please first embed documents before asking questions.")
 
 if st.button("Documents Embedding"):
     vector_embedding()
     st.write("Vector Store DB Is Ready")
+
+input_prompt= st.text_input("Enter Your Question From Documents: https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-015.pdf, https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-016.pdf")
+
+
 
 import time
 
