@@ -31,8 +31,8 @@ Questions:{input}
 """
 )
 
-import torch
-torch.cuda.set_device(0)  # Set the CUDA device to the first GPU (0)
+# import torch
+# torch.cuda.set_device(0)  # Set the CUDA device to the first GPU (0)
 # print(torch.cuda.is_available())  # Should print: True
 # print(torch.cuda.current_device())  # Should print: 0 (the first GPU)
 
@@ -43,7 +43,7 @@ def vector_embedding():
     if "vectors" not in st.session_state:
         st.session_state.embeddings=HuggingFaceBgeEmbeddings(
             model_name="BAAI/bge-large-en-v1.5",
-            model_kwargs={'device':'cuda'},
+            model_kwargs={'device':'cpu'},
             encode_kwargs={'normalize_embeddings':True}
         )
 
