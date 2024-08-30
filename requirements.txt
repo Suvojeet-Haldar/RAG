@@ -1,0 +1,10 @@
+python-dotenv
+streamlit
+langchain_groq
+langchain_community
+langchain
+langchain_core
+langchain_objectbox
+torch
+sentence_transformers
+pypdf
