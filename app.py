@@ -61,11 +61,11 @@ def vector_embedding():
 
 
 
-if st.button("Documents Embedding"):
+if st.button("Document(s) Embedding"):
     vector_embedding()
-    st.write("Vector Store DB Is Ready")
+    st.markdown(":green[Vector Store DB Is Ready], you can now ask questions")
 
-input_prompt= st.text_input("Enter Your Question From Document: https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-017.pdf")
+input_prompt= st.text_input("Enter Your Questions from the document: https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-017.pdf")
 
 
 
@@ -93,4 +93,4 @@ if input_prompt:
                 st.write("--------------------------------")
     except AttributeError:
         # Code to handle the exception
-        st.markdown(":red[Please first embed documents before asking questions.]")
+        st.markdown(":red[Please first embed document(s) before asking questions.]")
