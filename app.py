@@ -57,15 +57,15 @@ def vector_embedding():
         st.session_state.final_documents= st.session_state.text_splitter.split_documents(st.session_state.docs) ## Splitting
 
         st.session_state.vectors=ObjectBox.from_documents(st.session_state.final_documents,st.session_state.embeddings,embedding_dimensions=1024) ## Vector HuggingFaceBgeEmbeddings
+    
 
 
-st.write("Please first embed documents before asking questions.")
 
 if st.button("Documents Embedding"):
     vector_embedding()
     st.write("Vector Store DB Is Ready")
 
-input_prompt= st.text_input("Enter Your Question From Documents: https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-015.pdf, https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-016.pdf")
+input_prompt= st.text_input("Enter Your Question From Document: https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-017.pdf")
 
 
 
@@ -76,17 +76,21 @@ import time
 if input_prompt:
     start=time.process_time()
     document_chain = create_stuff_documents_chain(llm, prompt_template)
-    retriever = st.session_state.vectors.as_retriever()
-    retrieval_chain = create_retrieval_chain(retriever, document_chain)
-    response=retrieval_chain.invoke({"input":input_prompt})
+    
+    try:
+        retriever = st.session_state.vectors.as_retriever()
+        retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        response=retrieval_chain.invoke({"input":input_prompt})
 
-    st.write(response['answer'])
-    st.write("Response time :", time.process_time()-start)
+        st.write(response['answer'])
+        st.write("Response time :", time.process_time()-start)
 
-
-    # With a streamlit expander 
-    with st.expander("Document Similarity Search"):
-        # Find the relevant chunks
-        for i, doc in enumerate(response["context"]):
-            st.write(doc.page_content)
-            st.write("--------------------------------")
+        # With a streamlit expander 
+        with st.expander("Document Similarity Search"):
+            # Find the relevant chunks
+            for i, doc in enumerate(response["context"]):
+                st.write(doc.page_content)
+                st.write("--------------------------------")
+    except AttributeError:
+        # Code to handle the exception
+        st.markdown(":red[Please first embed documents before asking questions.]")
