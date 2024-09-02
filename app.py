@@ -1,21 +1,28 @@
 import streamlit as st
-import os
 from langchain_groq import ChatGroq
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_objectbox.vectorstores import ObjectBox
 from langchain_community.document_loaders import PyPDFDirectoryLoader
+import time
 
 from dotenv import load_dotenv
 load_dotenv()
+import getpass
+import os
+
+# del os.environ['NVIDIA_API_KEY']  ## delete key and reset
+if os.environ.get("NVIDIA_API_KEY", "").startswith("nvapi-"):
+    print("Valid NVIDIA_API_KEY already in environment. Delete to reset")
 
 groq_api_key =os.getenv('GROQ_API_KEY')
 
 st.title("US Census RAG QA Bot")
-st.write("Using HuggingFace 'BAAI/bge-large-en-v1.5' embedding model & Objectbox VectorDB With Groq(Llama-3.1-70b-Versatile)")
+
+st.markdown('Using <a href="https://build.nvidia.com/nvidia/nv-embed-v1" target="_blank">nvidia/nv-embed-v1</a> for embedding, <a href="https://objectbox.io/" target="_blank">Objectbox</a> as VectorDB & Llama-3.1-70b-Versatile(<a href="https://groq.com/#" target="_blank">Groq</a>) as the llm.', unsafe_allow_html=True)
 
 llm=ChatGroq(groq_api_key=groq_api_key,
              model_name="Llama-3.1-70b-Versatile")
@@ -32,21 +39,11 @@ Questions:{input}
 """
 )
 
-# import torch
-# torch.cuda.set_device(0)  # Set the CUDA device to the first GPU (0)
-# print(torch.cuda.is_available())  # Should print: True
-# print(torch.cuda.current_device())  # Should print: 0 (the first GPU)
-
-
 # Vector Embedding and Objectbox Vectorstore db
 
 def vector_embedding():
     if "vectors" not in st.session_state:
-        st.session_state.embeddings=HuggingFaceBgeEmbeddings(
-            model_name="BAAI/bge-large-en-v1.5",
-            model_kwargs={'device':'cpu'},
-            encode_kwargs={'normalize_embeddings':True}
-        )
+        st.session_state.embeddings=NVIDIAEmbeddings(model="nvidia/nv-embed-v1")
 
         st.session_state.loader = PyPDFDirectoryLoader("./us_census") ## Data Ingestion
         
@@ -56,20 +53,22 @@ def vector_embedding():
         
         st.session_state.final_documents= st.session_state.text_splitter.split_documents(st.session_state.docs) ## Splitting
 
-        st.session_state.vectors=ObjectBox.from_documents(st.session_state.final_documents,st.session_state.embeddings,embedding_dimensions=1024) ## Vector HuggingFaceBgeEmbeddings
+        st.session_state.vectors=ObjectBox.from_documents(st.session_state.final_documents,st.session_state.embeddings,embedding_dimensions=4096) ## Vector HuggingFaceBgeEmbeddings
     
 
 
 
 if st.button("Document(s) Embedding"):
+    start=time.process_time()
     vector_embedding()
     st.markdown(":green[Vector Store DB Is Ready], you can now ask questions")
+    st.write("Embedding time :", time.process_time()-start)
 
-input_prompt= st.text_input("Enter Your Questions from the document: https://github.com/Suvojeet-Haldar/RAG/blob/main/us_census/acsbr-017.pdf")
+input_prompt= st.text_input(f"Enter Your Questions from the document: https://drive.google.com/file/d/1GOb4COSLf-dBp0Rmu_b9goPSgrhBg2GQ/view?usp=sharing")
+
+# st.markdown('<a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:dd728725-7701-4af7-b4a1-bb35a20f6d4e" target="_blank">Document</a>', unsafe_allow_html=True)
 
 
-
-import time
 
 
 
