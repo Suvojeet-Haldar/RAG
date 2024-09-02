@@ -4,7 +4,7 @@ langchain_groq
 langchain_community
 langchain
 langchain_core
-langchain_objectbox
 pypdf
 langchain-nvidia-ai-endpoints
-objectbox
+pinecone
+pinecone_text
