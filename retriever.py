@@ -5,6 +5,8 @@ from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
 from pinecone import Pinecone,ServerlessSpec
 import os
+import nltk
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -42,6 +44,7 @@ corpus = [doc.page_content for doc in final_documents]
 
 
 bm25_encoder=BM25Encoder().default()
+nltk.download('punkt_tab')
 # tfidf values on these sentence
 bm25_encoder.fit(corpus)
 
